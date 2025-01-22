@@ -6,9 +6,9 @@ export MKL_NUM_THREADS=4
 export CUDA_VISIBLE_DEVICES=0
 
 # Start Ollama in the background
-# ollama serve &
-# ollama pull bge-m3
-# ollama pull llama3.1
+ollama serve &
+ollama pull bge-m3
+ollama pull llama3.1
 
 # Wait for Ollama to start up
 max_attempts=30
