@@ -28,4 +28,4 @@ echo "Ollama is ready."
 echo "API is running on: http://0.0.0.0:7860"
 
 # Start the FastAPI server
-uvicorn main:app --host 0.0.0.0 --workers 4 --limit-concurrency 20
+uvicorn main:app --host 0.0.0.0 --port 7860 --workers 4 --limit-concurrency 20
