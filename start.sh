@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Set environment variables for optimization
-export OMP_NUM_THREADS=4
-export MKL_NUM_THREADS=4
-export CUDA_VISIBLE_DEVICES=0
 
 # Start Ollama in the background
 ollama serve &
