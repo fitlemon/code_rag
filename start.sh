@@ -7,8 +7,7 @@ export CUDA_VISIBLE_DEVICES=0
 
 # Start Ollama in the background
 ollama serve &
-# ollama pull bge-m3
-# ollama pull llama3.1
+
 
 # Wait for Ollama to start up
 max_attempts=30
@@ -23,7 +22,8 @@ while ! curl -s http://localhost:11434/api/tags >/dev/null; do
 done
 
 echo "Ollama is ready."
-
+ollama pull bge-m3
+ollama pull llama3.1
 # Print the API URL
 echo "API is running on: http://0.0.0.0:7860"
 
