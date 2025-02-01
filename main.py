@@ -135,7 +135,7 @@ with gr.Blocks() as user_block:
     msg = gr.Textbox(label="Напишите свой вопрос, касающийся Руководства пользователя")
     submit = gr.Button("➤ Отправить")
 
-    # Привязываем функцию handle_user_question
+    # Привязываем функцию handle_user_question к кнопке submit и вводу сообщения
     msg.submit(handle_user_question, inputs=[msg, chatbot], outputs=[msg, chatbot])
     submit.click(handle_user_question, inputs=[msg, chatbot], outputs=[msg, chatbot])
 
