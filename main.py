@@ -14,21 +14,20 @@ filepath = "data/user-guide.pdf"
 loader = PyPDFLoader(filepath)
 init_docs = loader.load()
 
-# Разбиваем документы на chunks (пример с RecursiveCharacterTextSplitter)
+# Разбиваем документы на chunks
 recursive_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
 split_docs = recursive_splitter.split_documents(init_docs)
 
-# Создаём векторное хранилище (FAISS). Вам нужен заранее определённый Embeddings
 
-# Create Embeddings using Ollama
+# Создаём векторизатор Ollama
 embeddings = OllamaEmbeddings(
     model="bge-m3",
 )
-
+# Создаём векторное хранилище (FAISS).
 vector_store = FAISS.from_documents(documents=split_docs, embedding=embeddings)
 retriever = vector_store.as_retriever()
 
-# 2) СИСТЕМНЫЙ ПРОМПТ ДЛЯ Llama 3.1
+# 2) СИСТЕМНЫЙ ПРОМПТ
 system_prompt = """Ты – виртуальный помощник, работающий в режиме RAG (Retrieval-Augmented Generation), который даёт ответы строго на основе предоставленных выдержек из «Руководства пользователя».
 
 Основные правила:
@@ -113,7 +112,7 @@ def handle_user_question(user_question, chat_history):
     chat_history.append((user_question, ""))
     yield "", chat_history  # рендерим, чтобы сразу увидеть вопрос
 
-    # 2) Показываем плейсхолдер (например, «генерация…»)
+    # 2) Показываем плейсхолдер
     chat_history[-1] = (user_question, "печатает...")
     yield "", chat_history  # рендерим, чтобы пользователь видел placeholder
 
@@ -124,30 +123,24 @@ def handle_user_question(user_question, chat_history):
     for chunk in stream:  # chunk -- это строка (часть ответа), приходящая от Ollama
         response = chunk["message"]["content"]
         partial_answer += response
-        # обновляем последний элемент chat_history на "текущий ответ"
+        # обновляем последний элемент chat_history на "текущий частичный ответ"
         chat_history[-1] = (user_question, partial_answer)
         yield "", chat_history
 
 
-with gr.Blocks() as demo:
+with gr.Blocks() as user_block:
     gr.Markdown("## Чат-бот (RAG) по Руководству пользователя")
 
     chatbot = gr.Chatbot(label="DOC AI")
     msg = gr.Textbox(label="Напишите свой вопрос, касающийся Руководства пользователя")
     submit = gr.Button("➤ Отправить")
 
-    # chat_history будет хранить список (вопрос, ответ)
-    chat_history = gr.State([])
-
     # Привязываем функцию handle_user_question
-    msg.submit(handle_user_question, inputs=[msg, chat_history], outputs=[msg, chatbot])
-    submit.click(
-        handle_user_question, inputs=[msg, chat_history], outputs=[msg, chatbot]
-    )
+    msg.submit(handle_user_question, inputs=[msg, chatbot], outputs=[msg, chatbot])
+    submit.click(handle_user_question, inputs=[msg, chatbot], outputs=[msg, chatbot])
 
     # Кнопка очистки истории
-    clear_btn = gr.ClearButton([msg, chatbot, chat_history], value="🗑️ Очистить историю")
+    clear_btn = gr.ClearButton([msg, chatbot, chatbot], value="🗑️ Очистить историю")
 
-app = FastAPI()
-
-app = gr.mount_gradio_app(app, demo, path="/")
+if __name__ == "__main__":
+    user_block.launch(share=True)
