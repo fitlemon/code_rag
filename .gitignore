@@ -4,4 +4,4 @@ __pycache__/
 # .pyc files
 *.pyc
 # .pdf files
-.pdf
+*.pdf
